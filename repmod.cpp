@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QDataStream>
+#include <QTextStream>
 #include <QDateTime>
 #include <cstring>
 
@@ -96,8 +97,7 @@ bool CRep::TestFileExist(const QString &fileName) {
 void CRep::AddExtData(const QString &sourceMnem, const QString &eventMnem, const QString &jobMnem,
                       unsigned int eventClass, const QString &data) {
 
-
-    qDebug() <<"данные "<< data;
+    qDebug() <<"data "<< data;
     REPHEADER rh;
     SetFileTime(&rh);
     SetUserPart(&rh, sourceMnem, eventMnem, jobMnem, eventClass);
@@ -115,16 +115,45 @@ void CRep::AddExtData(const QString &sourceMnem, const QString &eventMnem, const
     s.setByteOrder(QDataStream::LittleEndian);
     s << n_data;
 
-
-    qDebug() <<"данные "<<n_data <<"    " << data;
-
-    QByteArray encryptedData;
-
-    EncryptData(data.toLocal8Bit().right(n_data), encryptedData);
-
     m_file.seek(m_file.size());
 
-    m_file.write(encryptedHeader + lengthData + encryptedData);
+     QByteArray encryptedData;
+
+     QDataStream ss(&encryptedData, QIODevice::WriteOnly);
+        ss << data;
+
+    m_file.write(encryptedHeader + lengthData  );//+ data.toUtf8()
+
+    QTextStream crystr(&m_file);
+
+    QString test = "hello";
+    unsigned char test2[10];
+    memcpy( test2, test.toStdString().c_str() ,test.size());
+    test2[5] = 0;
+    qDebug() << (char*)test2;
+
+
+
+//    //qDebug() << ss << "print SS";+ encryptedData
+
+//    qDebug() << encryptedData;
+//  //  QByteArray superEncryptedData;
+//  //  QTextStream out(&m_file);
+
+//  //  m_file.write();
+
+//    qDebug() <<"data "<<n_data <<"cryakozyabra check"<< hex << data;
+
+
+//    qDebug() <<"data "<<n_data <<"    " << data;
+
+
+//         // EncryptData(encryptedData, superEncryptedData);
+
+//   // m_file.seek(m_file.size()-n_data);
+
+//        //    out << data;
+
 }
 
 
